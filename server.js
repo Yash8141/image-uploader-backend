@@ -8,7 +8,15 @@ import { fileURLToPath } from "url";
 import { File } from "./models/imageUpload.js";
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: ".env.local" });
+dotenv.config(); // Fallback to .env if .env.local doesn't exist
+
+// Debug: Log environment variables (remove in production)
+console.log("Environment check:");
+console.log("MONGODB_URI:", process.env.MONGODB_URI ? "Set" : "Not set");
+console.log("CLOUD_NAME:", process.env.CLOUD_NAME ? "Set" : "Not set");
+console.log("API_KEY:", process.env.API_KEY ? "Set" : "Not set");
+console.log("API_SECRET:", process.env.API_SECRET ? "Set" : "Not set");
 
 // Get current directory for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,9 +24,13 @@ const __dirname = path.dirname(__filename);
 
 // MongoDB connect
 mongoose
-  .connect(process.env.MONGODB_URI || process.env.MONGODB_URL, {
-    dbName: "image_uploader_db",
-  })
+  .connect(
+    "mongodb+srv://yashsolanki1622_db_user:Fguuuml5Lwcj1wsh@cluster0.iolebsr.mongodb.net/" ||
+      process.env.MONGODB_URL,
+    {
+      dbName: "image_uploader_db",
+    }
+  )
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.log("MongoDB connection error:", error));
 

@@ -1,0 +1,15 @@
+# Create a .env file in your project root with these variables:
+
+NODE_ENV=development
+MONGODB_URI=mongodb+srv://yashsolanki1622_db_user:Fguuuml5Lwcj1wsh@cluster0.iolebsr.mongodb.net/
+CLOUD_NAME=dkklnd2k1
+API_KEY=645396612834928
+API_SECRET=bP8daAr4MXqhfflNI1DtokJ6HYw
+PORT=3000
+
+# Instructions:
+# 1. Copy the above content
+# 2. Create a new file called ".env" in your project root
+# 3. Paste the content into the .env file
+# 4. Save the file
+# 5. Run your application again
