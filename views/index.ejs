@@ -145,7 +145,9 @@
       <% if(url) { %>
       <h2>File Uploaded Successfully</h2>
       <img src="<%= url %>" alt="uploaded image" />
-      <% }%>
+      <% } %> <% if(typeof error !== 'undefined' && error) { %>
+      <h2 style="color: red">Error: <%= error %></h2>
+      <% } %>
     </div>
   </body>
 </html>

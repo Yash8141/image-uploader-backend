@@ -4,29 +4,40 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import path from "path";
+import { fileURLToPath } from "url";
 import { File } from "./models/imageUpload.js";
-import { url } from "inspector";
 
-dotenv.config({ path: ".env.local" });
+// Load environment variables
+dotenv.config();
+
+// Get current directory for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // MongoDB connect
 mongoose
-  .connect(
-    "mongodb+srv://yashsolanki1622_db_user:Fguuuml5Lwcj1wsh@cluster0.iolebsr.mongodb.net/",
-    { dbName: "image_uploader_db" }
-  )
+  .connect(process.env.MONGODB_URI || process.env.MONGODB_URL, {
+    dbName: "image_uploader_db",
+  })
   .then(() => console.log("MongoDB connected"))
-  .catch((error) => console.log(error));
+  .catch((error) => console.log("MongoDB connection error:", error));
 
 // Cloudinary connect
 cloudinary.config({
-  cloud_name: "dkklnd2k1",
-  api_key: "645396612834928",
-  api_secret: "bP8daAr4MXqhfflNI1DtokJ6HYw",
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
 });
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 const storage = multer.diskStorage({
   destination: "./public/uploads",
@@ -43,20 +54,38 @@ app.get("/", (req, res) => {
 });
 
 app.post("/upload", upload.single("file"), async (req, res, next) => {
-  const file = req.file.path;
+  try {
+    if (!req.file) {
+      return res.status(400).render("index.ejs", {
+        url: null,
+        error: "No file uploaded",
+      });
+    }
 
-  const cloudinaryResponse = await cloudinary.uploader.upload(file, {
-    folder: "NodeJs_Mastery",
-  });
+    const file = req.file.path;
 
-  // save to database
-  const db = await File.create({
-    file_name: file.originalname,
-    public_id: cloudinaryResponse.public_id,
-    image_url: cloudinaryResponse.secure_url,
-  });
-  res.render("index.ejs", { url: cloudinaryResponse.secure_url });
-  // res.json({ message: "File uploaded successfully", data: cloudinaryResponse });
+    const cloudinaryResponse = await cloudinary.uploader.upload(file, {
+      folder: "NodeJs_Mastery",
+    });
+
+    // save to database
+    await File.create({
+      file_name: req.file.originalname,
+      public_id: cloudinaryResponse.public_id,
+      image_url: cloudinaryResponse.secure_url,
+    });
+
+    res.render("index.ejs", {
+      url: cloudinaryResponse.secure_url,
+      error: null,
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).render("index.ejs", {
+      url: null,
+      error: "Upload failed. Please try again.",
+    });
+  }
 });
 
 app.listen(port, () => {

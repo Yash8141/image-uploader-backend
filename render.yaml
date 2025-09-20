@@ -10,5 +10,9 @@ services:
         value: production
       - key: MONGODB_URI
         value: mongodb+srv://yashsolanki1622_db_user:Fguuuml5Lwcj1wsh@cluster0.iolebsr.mongodb.net/
-      - key: BASE_URL
-        value: 
+      - key: CLOUD_NAME
+        value: dkklnd2k1
+      - key: API_KEY
+        value: 645396612834928
+      - key: API_SECRET
+        value: bP8daAr4MXqhfflNI1DtokJ6HYw
