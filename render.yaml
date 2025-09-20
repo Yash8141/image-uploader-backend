@@ -3,7 +3,7 @@ services:
     name: image-uploader
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm run build
     startCommand: node index.js
     envVars:
       - key: NODE_ENV
